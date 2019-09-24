@@ -1,4 +1,5 @@
 # jenkins
-jenkins udemy laboratory
-commands
--- docker-compose up -d
+jenkins udemy laboratory.
+
+--- commands
+* docker-compose up -d
