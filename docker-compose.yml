@@ -6,9 +6,14 @@ services:
     build:
       context: jenkins-ansible     
     ports:
-      - "8080:8080"
+      - "8085:8080"
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+      - 192.168.5.13
     volumes:
       - $PWD/jenkins_home:/var/jenkins_home
+      - D:/kruger-projects/prescriptivoCD/max-prescriptivocd-parent/max-prescriptivocd-services/build/libs:/var/jenkins_deploy
     networks:
       - net
   remote_host:

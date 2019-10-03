@@ -1,0 +1,52 @@
+pipeline {
+	agent any
+	
+	environment {
+		REMOTE_USER = 'soporte'
+		PRIVATE_KEY = '/var/keys_soporte/soporte'
+		ARTIFACT_PATH = '/var/jenkins_deploy/*'
+		SSH_OPT = 'StrictHostKeyChecking no'
+		
+		SERVER_NAME1='svr-mj073v4n'
+		PROJECT_NAME_PORT1 = 'prescriptivo_cd_8880'
+		REMOTE_HOST1 = '10.190.6.95'
+		JBOSS_PATH1 = '/opt/rh/jboss/jboss-eap-7.1_prescriptivo_cd_8880'
+		
+		SERVER_NAME2='svr-8znpd42'
+		PROJECT_NAME_PORT2 = 'prescriptivo_cd_8880'
+		REMOTE_HOST2 = '10.200.6.71'
+		JBOSS_PATH2 = '/opt/rh/jboss/jboss-eap-7.1_prescriptivo_cd_8880'
+		
+		SERVER_NAME3='svr-e2bp546'
+		PROJECT_NAME_PORT3 = 'prescriptivo_cd_9680'
+		REMOTE_HOST3 = '10.190.6.117'
+		JBOSS_PATH3 = '/opt/rh/jboss/jboss-eap-7.1_prescriptivo_cd_9680'
+	}
+	stages {
+		stage ('Deploy Server $SERVER_NAME1') {
+			steps{
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST1 -i $PRIVATE_KEY  "sudo systemctl stop $PROJECT_NAME_PORT1.service"'
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST1 -i $PRIVATE_KEY "rm -rf $JBOSS_PATH1/standalone/deployments/max-prescriptivocd-services*.war"'
+				sh 'scp -o "$SSH_OPT" -i $PRIVATE_KEY -r $ARTIFACT_PATH $REMOTE_USER@$REMOTE_HOST1:$JBOSS_PATH1/standalone/deployments/'
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST1 -i $PRIVATE_KEY "sudo systemctl start $PROJECT_NAME_PORT1.service"'
+			}
+		}
+		stage ('Deploy Server $SERVER_NAME2') {
+			steps{
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST2 -i $PRIVATE_KEY  "sudo systemctl stop $PROJECT_NAME_PORT2.service"'
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST2 -i $PRIVATE_KEY "rm -rf $JBOSS_PATH2/standalone/deployments/max-prescriptivocd-services*.war"'
+				sh 'scp -o "$SSH_OPT" -i $PRIVATE_KEY -r $ARTIFACT_PATH $REMOTE_USER@$REMOTE_HOST2:$JBOSS_PATH2/standalone/deployments/'
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST2 -i $PRIVATE_KEY "sudo systemctl start $PROJECT_NAME_PORT2.service"'
+			}
+		}
+		stage ('Deploy Server $SERVER_NAME3') {
+			steps{
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST3 -i $PRIVATE_KEY  "sudo systemctl stop $PROJECT_NAME_PORT3.service"'
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST3 -i $PRIVATE_KEY "rm -rf $JBOSS_PATH3/standalone/deployments/max-prescriptivocd-services*.war"'
+				sh 'scp -o "$SSH_OPT" -i $PRIVATE_KEY -r $ARTIFACT_PATH $REMOTE_USER@$REMOTE_HOST3:$JBOSS_PATH3/standalone/deployments/'
+				sh 'ssh -o "$SSH_OPT" $REMOTE_USER@$REMOTE_HOST3 -i $PRIVATE_KEY "sudo systemctl start $PROJECT_NAME_PORT3.service"'
+			}
+		}
+		
+	}
+}
